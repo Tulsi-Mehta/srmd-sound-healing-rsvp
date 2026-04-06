@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Healing Meditation · [Your Chapter Name]</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#faf9f7;color:#1a1a1a;}
+.app{max-width:720px;margin:0 auto;padding:0 0 40px;}
+.hero{position:relative;width:100%;height:260px;overflow:hidden;}
+.hero-img{width:100%;height:100%;object-fit:cover;object-position:center 50%;}
+.hero-overlay{position:absolute;inset:0;background:rgba(18,6,2,0.58);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+.hero-logo{width:72%;max-width:420px;object-fit:contain;filter:drop-shadow(0 2px 16px rgba(0,0,0,0.6));}
+.hero-sub{color:rgba(255,255,255,0.80);font-size:13px;letter-spacing:0.6px;margin-top:10px;}
+.content{padding:22px 16px;}
+.section-title{font-size:20px;font-weight:500;margin-bottom:4px;}
+.section-sub{font-size:14px;color:#888;margin-bottom:20px;}
+.card{background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:18px;margin-bottom:14px;}
+.session-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.session-title{font-size:15px;font-weight:500;}
+.session-meta{font-size:13px;color:#888;margin-top:2px;}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.badge-open{background:#FAEEDA;color:#633806;}
+.badge-full{background:#FCEBEB;color:#791F1F;}
+.badge-past{background:#f1efe8;color:#5F5E5A;}
+.session-desc{font-size:13px;color:#555;line-height:1.7;margin:10px 0 14px;}
+.session-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.session-price{font-size:13px;color:#888;}
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #ccc;background:#fff;color:#333;transition:all 0.15s;}
+.btn:hover{background:#f5f5f5;}
+.btn:disabled{opacity:0.4;cursor:default;}
+.btn-primary{background:#7B2D2D;color:#fff;border-color:#7B2D2D;}
+.btn-primary:hover:not(:disabled){background:#5c2020;}
+input,textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:#1a1a1a;outline:none;}
+input:focus,textarea:focus{border-color:#7B2D2D;box-shadow:0 0 0 2px rgba(123,45,45,0.1);}
+label{font-size:12px;color:#666;display:block;margin-bottom:4px;}
+.form-group{margin-bottom:14px;}
+.error-msg{font-size:12px;color:#c0392b;margin-top:3px;}
+.field-error{border-color:#c0392b !important;}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
+.modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:440px;max-height:92vh;overflow-y:auto;}
+.modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+.close-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;line-height:1;}
+.close-btn:hover{color:#333;}
+.success-box{text-align:center;padding:48px 20px;}
+.check-circle{width:60px;height:60px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.about-panel{background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:22px;margin-bottom:20px;}
+.about-panel-warm{background:#fdf8f3;border:1px solid #ecddd0;border-radius:12px;padding:22px;margin-bottom:24px;}
+.step-num{width:28px;height:28px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:500;color:#633806;}
+.divider{border:none;border-top:1px solid #e8e5e0;margin:16px 0;}
+.section-divider{display:flex;align-items:center;gap:12px;margin:28px 0 20px;}
+.section-divider-line{flex:1;height:1px;background:#e8e5e0;}
+.section-divider-label{font-size:12px;font-weight:500;color:#aaa;letter-spacing:0.6px;text-transform:uppercase;white-space:nowrap;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.toast.show{opacity:1;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-state{text-align:center;padding:40px 0;color:#aaa;font-size:14px;}
+</style>
+
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="SRMD Yoga Sound Healing"/>
+<meta property="og:url" content="https://your-site.netlify.app"/>
+<meta property="og:title" content="Sound Healing · SRMD Yoga · Bay Area"/>
+<meta property="og:image" content="https://your-site.netlify.app/og-image.jpg"/>
+<meta property="og:image:secure_url" content="https://your-site.netlify.app/og-image.jpg"/>
+<meta property="og:image:type" content="image/jpeg"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="SRMD Yoga Sound Healing Meditation Bay Area"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Sound Healing · SRMD Yoga · Bay Area"/>
+<meta name="twitter:image" content="https://your-site.netlify.app/og-image.jpg"/>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+var SUPABASE_URL     = 'https://your-project-id.supabase.co';  /* your Supabase project URL */
+var SUPABASE_ANON_KEY = 'your-supabase-anon-key-here';  /* your Supabase anon/public key */
+var LOGO = 'LOGO_PLACEHOLDER'  /* replace with your base64 logo or image URL */;
+var LOGO_MAROON = 'LOGO_MAROON_PLACEHOLDER'  /* replace with maroon variant or same logo URL */;
+var BOWL = 'BOWL_PLACEHOLDER'  /* replace with your hero image base64 or URL */;
+
+var db = null;
+function getDB(){
+  if(db) return db;
+  if(!SUPABASE_URL||!SUPABASE_ANON_KEY) return null;
+  db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return db;
+}
+
+var state = {
+  modal:false, selectedId:null, success:false,
+  form:{name:'',email:'',phone:'',notes:''}, errors:{},
+  sessions:[], rsvps:{}, loading:false, submitting:false,
+};
+
+function isPast(s){return new Date(s.date)<new Date();}
+function spotsLeft(s){return s.capacity-(state.rsvps[s.id]||[]).length;}
+function fmtDate(d){var dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+function fmtPrice(p){return p===0?'Free':'$'+p;}
+function q(id){return document.getElementById(id);}
+function toast(msg,dur){var t=q('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},dur||2800);}
+
+async function loadSessions(){
+  var client=getDB();
+  if(!client){
+    state.sessions=[
+      {id:1,title:'Sound Healing Meditation',date:'2026-04-12',time:'TBD',location:'Sunnyvale, CA',capacity:30,price:0,instruments:'Tibetan singing bowls',description:'Relax, rebalance and renew your spirit. A free sound healing meditation session open to all. Donations for a noble cause are optional.'},
+      {id:2,title:'New Moon Sound Bath',date:'2026-04-18',time:'7:00 PM',location:'Inner Sunset Studio, SF',capacity:15,price:35,instruments:'Crystal bowls, gong, koshi chimes',description:'A gentle immersion to welcome the new lunar cycle. Lie back and let the vibrations guide you inward.'},
+      {id:3,title:'Full Moon Ceremony',date:'2026-04-26',time:'8:00 PM',location:'Dolores Park (outdoor), SF',capacity:25,price:40,instruments:'Gong, crystal bowls, drums',description:'Our signature outdoor ceremony under the full moon. Bring a blanket and an open heart.'},
+      {id:4,title:'Sound Healing Meditation',date:'2026-03-15',time:'6:00 PM',location:'Sunnyvale Community Center, CA',capacity:30,price:0,instruments:'Tibetan singing bowls, pulse tubes',description:'A free sound healing session for the community. Relax, rebalance and renew your spirit.'},
+      {id:5,title:'New Moon Reset',date:'2026-03-01',time:'7:00 PM',location:'Noe Valley Wellness, SF',capacity:15,price:35,instruments:'Crystal bowls, rainstick, koshi chimes',description:'A gentle immersion to set intentions and invite fresh beginnings through healing sound.'},
+      {id:6,title:'Stress Release & Deep Rest',date:'2026-02-14',time:'6:30 PM',location:'Inner Sunset Studio, SF',capacity:20,price:35,instruments:'Tibetan bowls, ocean drum, pulse tubes',description:'Let the vibrations of Tibetan bowls melt tension and guide your body into deep relaxation.'},
+    ];
+    state.rsvps={1:[],2:[],3:[],4:[{id:1},{id:2},{id:3},{id:4},{id:5},{id:6},{id:7},{id:8},{id:9},{id:10},{id:11},{id:12},{id:13},{id:14},{id:15},{id:16},{id:17},{id:18},{id:19},{id:20},{id:21},{id:22},{id:23},{id:24},{id:25},{id:26},{id:27},{id:28}],5:[{id:1},{id:2},{id:3},{id:4},{id:5},{id:6},{id:7},{id:8},{id:9},{id:10},{id:11},{id:12}],6:[{id:1},{id:2},{id:3},{id:4},{id:5},{id:6},{id:7},{id:8},{id:9},{id:10},{id:11},{id:12},{id:13},{id:14},{id:15},{id:16},{id:17}]};
+    render(); return;
+  }
+  state.loading=true; render();
+  var res=await client.from('sessions').select('*').order('date',{ascending:true});
+  if(res.error){toast('Error loading sessions');state.loading=false;render();return;}
+  state.sessions=res.data||[];
+  for(var i=0;i<state.sessions.length;i++){
+    var sid=state.sessions[i].id;
+    var r=await client.from('rsvps').select('id').eq('session_id',sid);
+    state.rsvps[sid]=r.data||[];
+  }
+  state.loading=false; render();
+}
+
+async function submitRSVP(sessionId,formData){
+  var client=getDB();
+  if(!client){
+    if(!state.rsvps[sessionId]) state.rsvps[sessionId]=[];
+    state.rsvps[sessionId].push(Object.assign({id:Date.now(),session_id:sessionId,created_at:new Date().toISOString()},formData));
+    state.modal=false;state.success=true;state.submitting=false;render();return;
+  }
+  var res=await client.from('rsvps').insert([Object.assign({session_id:sessionId},formData)]);
+  if(res.error){var msg=res.error.message||JSON.stringify(res.error);toast('Error: '+msg,4000);state.submitting=false;render();return;}
+  var r=await client.from('rsvps').select('id').eq('session_id',sessionId);
+  state.rsvps[sessionId]=r.data||[];
+  state.modal=false;state.success=true;state.submitting=false;render();
+}
+
+function buildAboutSection(){
+  return '<div class="about-panel">'
+    +'<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">'
+    +'<img src="'+LOGO_MAROON+'" style="height:50px;object-fit:contain;">'
+    +'<div><p style="font-size:15px;font-weight:500;color:#7B2D2D;">SRMD Yoga</p>'
+    +'<p style="font-size:13px;color:#888;margin-top:2px;">Sound Healing &middot; Meditation &middot; Yoga</p></div>'
+    +'</div>'
+    +'<div class="divider"></div>'
+    +'<p style="font-size:15px;font-weight:500;color:#7B2D2D;margin-bottom:12px;">Welcome to SRMD Yoga Sound Healing, San Francisco Chapter!</p>'
+    +'<p style="font-size:14px;color:#444;line-height:1.8;margin-bottom:12px;">Sound healing uses the resonant frequencies of Tibetan singing bowls, pulse tubes, gongs, and other instruments to guide the body and mind back to a natural state of balance.</p>'
+    +'<p style="font-size:14px;color:#444;line-height:1.8;margin-bottom:18px;">Experience the shift at a Sound Therapist led session in the Bay Area. Sound Therapists are certified by the <span style="font-weight:500;">CMA</span> (Complementary Medical Association, UK) and by <span style="font-weight:500;">YACEP</span> (Yoga Alliance Continuing Education Provider) in affiliation with <span style="font-weight:500;color:#7B2D2D;">SRMD Yoga</span> &mdash; a community dedicated to holistic well-being through yoga, meditation, and sound.</p>'
+    +'<a href="https://srmdyoga.org" target="_blank" style="display:inline-block;background:#7B2D2D;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;text-decoration:none;">Visit srmdyoga.org &#8599;</a>'
+    +'</div>'
+    +'<div class="about-panel-warm">'
+    +'<p style="font-size:14px;font-weight:500;margin-bottom:14px;color:#7B2D2D;">What to expect</p>'
+    +'<div style="display:grid;gap:12px;">'
+    +'<div style="display:flex;gap:12px;align-items:flex-start;"><div class="step-num">1</div><div><p style="font-size:13px;font-weight:500;">Arrive &amp; settle</p><p style="font-size:13px;color:#888;margin-top:2px;">Find a comfortable spot. Mats and cushions are provided.</p></div></div>'
+    +'<div style="display:flex;gap:12px;align-items:flex-start;"><div class="step-num">2</div><div><p style="font-size:13px;font-weight:500;">Immersive sound journey</p><p style="font-size:13px;color:#888;margin-top:2px;">45 minutes of live sound healing. Simply lie back and receive.</p></div></div>'
+    +'<div style="display:flex;gap:12px;align-items:flex-start;"><div class="step-num">3</div><div><p style="font-size:13px;font-weight:500;">Integration &amp; community</p><p style="font-size:13px;color:#888;margin-top:2px;">Gentle close, sharing circle, and herbal tea.</p></div></div>'
+    +'</div></div>';
+}
+
+function render(){
+  var header='<div class="hero"><img class="hero-img" src="'+BOWL+'"/>'
+    +'<div class="hero-overlay"><img class="hero-logo" src="'+LOGO+'"/>'
+    +'<p class="hero-sub">Bay Area, CA &nbsp;&middot;&nbsp; Sound Healing Meditation</p>'
+    +'</div></div>';
+  q('app').innerHTML = header+'<div class="content">'+buildPublic()+'</div>';
+  bind();
+}
+
+function buildPublic(){
+  if(state.success&&state.selectedId){
+    var s=state.sessions.find(function(x){return x.id===state.selectedId;});
+    return '<div class="success-box">'
+      +'<div class="check-circle"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7B2D2D" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>'
+      +'<p style="font-size:20px;font-weight:500;margin-bottom:8px;">You&#39;re registered!</p>'
+      +'<p style="color:#888;font-size:14px;margin-bottom:4px;">'+(s?s.title:'')+'</p>'
+      +'<p style="color:#888;font-size:14px;margin-bottom:24px;">'+(s?fmtDate(s.date)+' &middot; '+s.time:'')+'</p>'
+      +'<p style="font-size:13px;color:#aaa;margin-bottom:24px;">A confirmation will be sent to your email. All are welcome.</p>'
+      +'<button class="btn btn-primary" id="btn-another">Register for another session</button>'
+      +'</div>';
+  }
+  if(state.loading) return '<div class="loading-state">Loading sessions...</div>';
+  var upcoming=state.sessions.filter(function(s){return !isPast(s);}).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  var html=buildAboutSection();
+  html+='<div class="section-divider"><div class="section-divider-line"></div><span class="section-divider-label">Upcoming sessions</span><div class="section-divider-line"></div></div>';
+  if(!upcoming.length) html+='<p style="color:#aaa;text-align:center;padding:2rem 0;">No upcoming sessions right now. Check back soon.</p>';
+  upcoming.forEach(function(s){
+    var left=spotsLeft(s),full=left<=0;
+    html+='<div class="card">'
+      +'<div class="session-header"><div>'
+      +'<p class="session-title">'+s.title+'</p>'
+      +'<p class="session-meta">'+fmtDate(s.date)+' &middot; '+s.time+'</p>'
+      +'<p class="session-meta">'+s.location+'</p>'
+      +'</div><span class="badge '+(full?'badge-full':'badge-open')+'">'+(full?'Full':left+' spots left')+'</span></div>'
+      +'<p class="session-desc">'+s.description+'</p>'
+      +'<div class="session-footer">'
+      +'<span class="session-price">'+fmtPrice(s.price)+(s.price===0?' &middot; Donations welcome':'')+'</span>'
+      +'<button class="btn'+(full?'':' btn-primary')+' btn-rsvp" data-id="'+s.id+'"'+(full?' disabled':'')+'>Reserve spot</button>'
+      +'</div></div>';
+  });
+
+  // Past sessions section
+  var past=state.sessions.filter(function(s){return isPast(s);}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  if(past.length){
+    html+='<div class="section-divider" style="margin-top:32px;"><div class="section-divider-line"></div><span class="section-divider-label">Past sessions</span><div class="section-divider-line"></div></div>';
+    past.forEach(function(s){
+      var attended=(state.rsvps[s.id]||[]).length;
+      html+='<div class="card" style="opacity:0.82;">'
+        +'<div class="session-header"><div>'
+        +'<p class="session-title" style="color:var(--color-text-secondary);">'+s.title+'</p>'
+        +'<p class="session-meta">'+fmtDate(s.date)+' &middot; '+s.time+'</p>'
+        +'<p class="session-meta">'+s.location+'</p>'
+        +'</div><span class="badge badge-past">Completed</span></div>'
+        +'<p class="session-desc">'+s.description+'</p>'
+        +'<div class="session-footer">'
+        +'<span class="session-price">'+fmtPrice(s.price)+(s.instruments?' &middot; '+s.instruments:'')+'</span>'
+        +(attended?'<span style="font-size:12px;color:var(--color-text-secondary);">'+attended+' attended</span>':'')
+        +'</div></div>';
+    });
+  }
+
+  if(state.modal&&state.selectedId) html+=buildModal();
+  return html;
+}
+
+function buildModal(){
+  var s=state.sessions.find(function(x){return x.id===state.selectedId;}); if(!s) return '';
+  var f=state.form,e=state.errors;
+  return '<div class="overlay" id="overlay">'
+    +'<div class="modal"><div class="modal-header"><div>'
+    +'<p style="font-size:15px;font-weight:500;">'+s.title+'</p>'
+    +'<p style="font-size:13px;color:#888;">'+fmtDate(s.date)+' &middot; '+s.location+'</p>'
+    +'</div><button class="close-btn" id="btn-close">&times;</button></div>'
+    +'<div class="form-group"><label>Full name *</label>'
+    +'<input id="f-name" value="'+f.name+'" placeholder="Your name"'+(e.name?' class="field-error"':'')+'>'
+    +(e.name?'<p class="error-msg">'+e.name+'</p>':'')+'</div>'
+    +'<div class="form-group"><label>Email *</label>'
+    +'<input id="f-email" type="email" value="'+f.email+'" placeholder="you@email.com"'+(e.email?' class="field-error"':'')+'>'
+    +(e.email?'<p class="error-msg">'+e.email+'</p>':'')+'</div>'
+    +'<div class="form-group"><label>Phone (optional)</label>'
+    +'<input id="f-phone" value="'+f.phone+'" placeholder="415-555-0100"></div>'
+    +'<div class="form-group"><label>Notes (accessibility, first time, etc.)</label>'
+    +'<textarea id="f-notes" rows="2" placeholder="Anything we should know...">'+f.notes+'</textarea></div>'
+    +'<button class="btn btn-primary" id="btn-submit" style="width:100%;padding:11px;font-size:14px;"'+(state.submitting?' disabled':'')+'>'+
+      (state.submitting?'<span class="spinner"></span>Registering...':'Confirm &mdash; '+fmtPrice(s.price)+(s.price===0?' (Free)':''))
+    +'</button></div></div>';
+}
+
+function bind(){
+  q('btn-another')&&q('btn-another').addEventListener('click',function(){state.success=false;state.selectedId=null;render();});
+  q('btn-close')&&q('btn-close').addEventListener('click',function(){state.modal=false;render();});
+  q('overlay')&&q('overlay').addEventListener('click',function(e){if(e.target===q('overlay')){state.modal=false;render();}});
+  document.querySelectorAll('.btn-rsvp').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      state.selectedId=parseInt(btn.dataset.id);state.modal=true;
+      state.form={name:'',email:'',phone:'',notes:''};state.errors={};render();
+    });
+  });
+  q('btn-submit')&&q('btn-submit').addEventListener('click',function(){
+    var name=q('f-name').value.trim(),email=q('f-email').value.trim();
+    var phone=q('f-phone')?q('f-phone').value.trim():'',notes=q('f-notes')?q('f-notes').value.trim():'';
+    var errs={};
+    if(!name) errs.name='Please enter your name.';
+    if(!email||!/\S+@\S+\.\S+/.test(email)) errs.email='Please enter a valid email.';
+    state.form={name:name,email:email,phone:phone,notes:notes};state.errors=errs;
+    if(Object.keys(errs).length){render();return;}
+    state.submitting=true;render();
+    submitRSVP(state.selectedId,{name:name,email:email,phone:phone,notes:notes});
+  });
+}
+
+loadSessions();
+</script>
+</body>
+</html>

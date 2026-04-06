@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Sound Healing · SRMD Yoga</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#faf9f7;color:#1a1a1a;}
+.app{max-width:720px;margin:0 auto;padding:0 0 40px;}
+.hero{position:relative;width:100%;height:260px;overflow:hidden;}
+.hero-img{width:100%;height:100%;object-fit:cover;object-position:center 50%;}
+.hero-overlay{position:absolute;inset:0;background:rgba(18,6,2,0.58);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+.hero-logo{width:72%;max-width:420px;object-fit:contain;filter:drop-shadow(0 2px 16px rgba(0,0,0,0.6));}
+.hero-sub{color:rgba(255,255,255,0.80);font-size:13px;letter-spacing:0.6px;margin-top:10px;}
+.content{padding:22px 16px;}
+.section-title{font-size:20px;font-weight:500;margin-bottom:4px;}
+.card{background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:18px;margin-bottom:14px;}
+.session-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.session-title{font-size:15px;font-weight:500;}
+.session-meta{font-size:13px;color:#888;margin-top:2px;}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.badge-open{background:#FAEEDA;color:#633806;}
+.badge-full{background:#FCEBEB;color:#791F1F;}
+.badge-past{background:#f1efe8;color:#555;}
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #ccc;background:#fff;color:#333;transition:all 0.15s;}
+.btn:hover{background:#f5f5f5;}
+.btn:disabled{opacity:0.4;cursor:default;}
+.btn-primary{background:#7B2D2D;color:#fff;border-color:#7B2D2D;}
+.btn-primary:hover:not(:disabled){background:#5c2020;}
+.btn-teal{background:#0F6E56;color:#fff;border-color:#0F6E56;}
+.btn-teal:hover{background:#085041;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-danger{color:#c0392b;border-color:#e0b0b0;background:#fff;}
+.btn-danger:hover{background:#FCEBEB;}
+.btn-warn{color:#854F0B;border-color:#e8c87a;background:#fff;}
+.btn-warn:hover{background:#FAEEDA;}
+.dash-actions{display:flex;gap:6px;flex-shrink:0;}
+input,textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:#1a1a1a;outline:none;}
+input:focus,textarea:focus{border-color:#7B2D2D;box-shadow:0 0 0 2px rgba(123,45,45,0.1);}
+label{font-size:12px;color:#666;display:block;margin-bottom:4px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{margin-bottom:14px;}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.metric{background:#f5f3ef;border-radius:8px;padding:14px;}
+.metric-label{font-size:12px;color:#888;margin-bottom:4px;}
+.metric-value{font-size:22px;font-weight:500;}
+.p-card{background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:#FAEEDA;color:#633806;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.progress-bar{height:4px;background:#eee;border-radius:4px;overflow:hidden;flex:1;}
+.progress-fill{height:100%;border-radius:4px;}
+.fill-green{background:#1D9E75;}.fill-amber{background:#EF9F27;}.fill-red{background:#E24B4A;}
+.db-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.back-btn{background:none;border:none;font-size:13px;color:#888;cursor:pointer;padding:0;margin-bottom:18px;}
+.lock-badge{display:inline-flex;align-items:center;gap:5px;background:#fff3e0;color:#7B2D2D;font-size:11px;padding:3px 10px;border-radius:20px;margin-bottom:12px;border:1px solid #e8d5c0;}
+.logout-btn{background:none;border:none;font-size:12px;color:#aaa;cursor:pointer;}
+.logout-btn:hover{color:#7B2D2D;}
+.config-banner{background:#fff8e8;border:1px solid #f0d080;border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#7a5800;line-height:1.6;}
+.config-banner code{background:#fff0c0;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.toast.show{opacity:1;}
+/* PIN */
+.pin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px;text-align:center;}
+.pin-dots{display:flex;gap:12px;margin:20px 0;}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:#e0ddd8;transition:background 0.15s;}
+.pin-dot.filled{background:#7B2D2D;}
+.pin-pad{display:grid;grid-template-columns:repeat(3,64px);gap:10px;}
+.pin-key{width:64px;height:64px;border-radius:50%;border:1px solid #e0ddd8;background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+.pin-key:hover{background:#faf0ee;border-color:#c0a090;}
+.pin-key:active{transform:scale(0.93);}
+.pin-key.del{font-size:14px;color:#888;}
+.pin-shake{animation:shake 0.35s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+@media(max-width:500px){.form-row{grid-template-columns:1fr;}.metric-grid{grid-template-columns:repeat(2,1fr);}}
+.confirm-box{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:380px;text-align:center;}
+</style>
+
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="SRMD Yoga Sound Healing"/>
+<meta property="og:url" content="https://your-site.netlify.app/admin.html"/>
+<meta property="og:title" content="Sound Healing · SRMD Yoga · Bay Area"/>
+<meta property="og:image" content="https://your-site.netlify.app/og-image.jpg"/>
+<meta property="og:image:secure_url" content="https://your-site.netlify.app/og-image.jpg"/>
+<meta property="og:image:type" content="image/jpeg"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="SRMD Yoga Sound Healing Meditation Bay Area"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Sound Healing · SRMD Yoga · Bay Area"/>
+<meta name="twitter:image" content="https://your-site.netlify.app/og-image.jpg"/>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+var SUPABASE_URL     = 'https://your-project-id.supabase.co';
+var SUPABASE_ANON_KEY = 'your-supabase-anon-key-here';
+var DASHBOARD_PIN   = '0000';  /* change this to your own 4-digit PIN */
+var LOGO = 'LOGO_PLACEHOLDER';
+var LOGO_MAROON = 'LOGO_MAROON_PLACEHOLDER';
+var BOWL = 'BOWL_PLACEHOLDER';
+
+var db = null;
+function getDB(){
+  if(db) return db;
+  if(!SUPABASE_URL||!SUPABASE_ANON_KEY) return null;
+  db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return db;
+}
+
+var state = {
+  unlocked:false, pinEntry:'', pinError:false,
+  addingSession:false, editingSession:null, confirmDelete:null, viewingId:null,
+  sessions:[], rsvps:{}, loading:false,
+};
+
+function isPast(s){return new Date(s.date)<new Date();}
+function spotsLeft(s){return s.capacity-(state.rsvps[s.id]||[]).length;}
+function initials(n){return n.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();}
+function fmtDate(d){var dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+function fmtPrice(p){return p===0?'Free':'$'+p;}
+function q(id){return document.getElementById(id);}
+function toast(msg,dur){var t=q('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},dur||2800);}
+
+async function loadSessions(){
+  var client=getDB();
+  if(!client){
+    state.sessions=[
+      {id:1,title:'Sound Healing Meditation',date:'2026-04-12',time:'TBD',location:'Sunnyvale, CA',capacity:30,price:0,instruments:'Tibetan singing bowls',description:'Relax, rebalance and renew your spirit.'},
+      {id:2,title:'New Moon Sound Bath',date:'2026-04-18',time:'7:00 PM',location:'Inner Sunset Studio, SF',capacity:15,price:35,instruments:'Crystal bowls, gong',description:'A gentle immersion to welcome the new lunar cycle.'},
+      {id:3,title:'Full Moon Ceremony',date:'2026-04-26',time:'8:00 PM',location:'Dolores Park (outdoor), SF',capacity:25,price:40,instruments:'Gong, crystal bowls',description:'Under the full moon. Bring a blanket.'},
+    ];
+    state.rsvps={1:[
+      {id:1,name:'Anya Sharma',email:'anya@email.com',phone:'415-555-0101',notes:'First timer!',created_at:new Date().toISOString()},
+      {id:2,name:'Carlos Reyes',email:'carlos@email.com',phone:'',notes:'',created_at:new Date().toISOString()},
+    ],2:[],3:[]};
+    render(); return;
+  }
+  state.loading=true; render();
+  var res=await client.from('sessions').select('*').order('date',{ascending:true});
+  if(res.error){toast('Error: '+res.error.message,4000);state.loading=false;render();return;}
+  state.sessions=res.data||[];
+  for(var i=0;i<state.sessions.length;i++){
+    var sid=state.sessions[i].id;
+    var r=await client.from('rsvps').select('*').eq('session_id',sid);
+    state.rsvps[sid]=r.data||[];
+  }
+  state.loading=false; render();
+}
+
+async function deleteRSVP(sessionId,rsvpId){
+  var client=getDB();
+  if(!client){state.rsvps[sessionId]=(state.rsvps[sessionId]||[]).filter(function(r){return r.id!=rsvpId;});render();return;}
+  await client.from('rsvps').delete().eq('id',rsvpId);
+  state.rsvps[sessionId]=(state.rsvps[sessionId]||[]).filter(function(r){return r.id!=rsvpId;});
+  toast('Participant removed');render();
+}
+
+async function saveSession(data){
+  var client=getDB();
+  if(!client){var ns=Object.assign({id:Date.now()},data);state.sessions.push(ns);state.rsvps[ns.id]=[];state.addingSession=false;render();return;}
+  console.log('[saveSession]',JSON.stringify(data));
+  var res=await client.from('sessions').insert([data]).select();
+  console.log('[saveSession] response',JSON.stringify(res));
+  if(res.error){
+    var msg=res.error.message||res.error.hint||JSON.stringify(res.error);
+    toast('Error: '+msg,5000);
+    var el=q('save-error');if(el){el.textContent=msg;el.style.display='block';}
+    return;
+  }
+  state.sessions.push(res.data[0]);state.rsvps[res.data[0].id]=[];
+  state.addingSession=false;toast('Session saved!');render();
+}
+
+function render(){
+  var hero='<div class="hero"><img class="hero-img" src="'+BOWL+'"/><div class="hero-overlay"><img class="hero-logo" src="'+LOGO+'"/><p class="hero-sub">Bay Area, CA &nbsp;&middot;&nbsp; Sound Healing Meditation</p></div></div>';
+  q('app').innerHTML=hero+'<div class="content">'+(state.unlocked?buildDash():buildPin())+'</div>';
+  bind();
+}
+
+async function updateSession(id,data){
+  var client=getDB();
+  if(!client){
+    var idx=state.sessions.findIndex(function(s){return s.id===id;});
+    if(idx>-1) state.sessions[idx]=Object.assign(state.sessions[idx],data);
+    state.editingSession=null;state.viewingId=null;render();return;
+  }
+  var res=await client.from('sessions').update(data).eq('id',id).select();
+  if(res.error){toast('Error: '+(res.error.message||''),5000);return;}
+  var idx=state.sessions.findIndex(function(s){return s.id===id;});
+  if(idx>-1) state.sessions[idx]=res.data[0];
+  state.editingSession=null;state.viewingId=null;toast('Session updated!');render();
+}
+
+async function deleteSession(id){
+  var client=getDB();
+  if(!client){
+    state.sessions=state.sessions.filter(function(s){return s.id!==id;});
+    delete state.rsvps[id];
+    state.confirmDelete=null;state.viewingId=null;render();return;
+  }
+  await client.from('rsvps').delete().eq('session_id',id);
+  var res=await client.from('sessions').delete().eq('id',id);
+  if(res.error){toast('Error: '+(res.error.message||''),5000);return;}
+  state.sessions=state.sessions.filter(function(s){return s.id!==id;});
+  delete state.rsvps[id];
+  state.confirmDelete=null;state.viewingId=null;toast('Session deleted');render();
+}
+
+function buildPin(){
+  var pin=state.pinEntry;
+  var dots='';for(var i=0;i<4;i++) dots+='<div class="pin-dot'+(i<pin.length?' filled':'')+'"></div>';
+  return '<div class="pin-screen">'
+    +'<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7B2D2D" stroke-width="1.5" style="margin-bottom:12px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+    +'<p style="font-size:17px;font-weight:500;margin-bottom:4px;">Teacher Dashboard</p>'
+    +'<p style="font-size:13px;color:#aaa;margin-bottom:4px;">Enter your PIN to continue</p>'
+    +(state.pinError?'<p style="font-size:12px;color:#c0392b;margin-top:4px;">Incorrect PIN. Try again.</p>':'<p style="font-size:12px;color:transparent;">&#8203;</p>')
+    +'<div class="pin-dots" id="pin-dots">'+dots+'</div>'
+    +'<div class="pin-pad">'
+    +[1,2,3,4,5,6,7,8,9,'','0','⌫'].map(function(k){
+      if(k==='') return '<div></div>';
+      return '<button class="pin-key'+(k==='⌫'?' del':'')+'" data-key="'+k+'">'+k+'</button>';
+    }).join('')
+    +'</div></div>';
+}
+
+function buildDash(){
+  if(state.confirmDelete) return buildConfirmDelete();
+  if(state.addingSession) return buildSessionForm(null);
+  if(state.editingSession) return buildSessionForm(state.editingSession);
+  if(state.viewingId) return buildDetail();
+  var dbOk=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
+  var banner=dbOk?'':'<div class="config-banner"><strong style="font-weight:500;">&#9432; Demo mode</strong> — Supabase not connected.<br>Set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> at the top of the script.</div>';
+  var upcoming=state.sessions.filter(function(s){return !isPast(s);});
+  var past=state.sessions.filter(function(s){return isPast(s);});
+  var allR=state.sessions.reduce(function(a,s){return a+(state.rsvps[s.id]||[]).length;},0);
+  var rev=state.sessions.reduce(function(a,s){return a+((state.rsvps[s.id]||[]).length*s.price);},0);
+  var html=banner
+    +'<div class="db-row"><p class="section-title">Your sessions</p>'
+    +'<div style="display:flex;align-items:center;gap:8px;">'
+    +'<button class="btn btn-teal" id="btn-add">+ New session</button>'
+    +'<button class="logout-btn" id="btn-logout">&#128274; Lock</button>'
+    +'</div></div>'
+    +'<div class="lock-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> PIN protected</div>'
+    +'<div class="metric-grid">'
+    +'<div class="metric"><p class="metric-label">Upcoming</p><p class="metric-value">'+upcoming.length+'</p></div>'
+    +'<div class="metric"><p class="metric-label">Registered</p><p class="metric-value">'+allR+'</p></div>'
+    +'<div class="metric"><p class="metric-label">Est. revenue</p><p class="metric-value">$'+rev.toLocaleString()+'</p></div>'
+    +'</div>';
+  if(upcoming.length){html+='<p style="font-size:13px;font-weight:500;color:#888;margin-bottom:10px;">Upcoming</p>';upcoming.forEach(function(s){html+=buildDashCard(s);});}
+  if(past.length){html+='<p style="font-size:13px;font-weight:500;color:#888;margin:20px 0 10px;">Past</p>';past.forEach(function(s){html+=buildDashCard(s);});}
+  return html;
+}
+
+function buildDashCard(s){
+  var rl=state.rsvps[s.id]||[],left=spotsLeft(s),past=isPast(s);
+  var pct=s.capacity>0?Math.round((rl.length/s.capacity)*100):0;
+  var fc=pct>=100?'fill-red':pct>=70?'fill-amber':'fill-green';
+  return '<div class="card" style="'+(past?'opacity:0.82;':'')+'">'
+    +'<div class="session-header">'
+    +'<div style="cursor:pointer;flex:1;min-width:0;" id="dc-'+s.id+'">'
+    +'<p class="session-title">'+s.title+'</p>'
+    +'<p class="session-meta">'+fmtDate(s.date)+' &middot; '+s.time+' &middot; '+s.location+'</p>'
+    +'</div>'
+    +'<div class="dash-actions">'
+    +'<button class="btn btn-sm btn-warn btn-edit" data-id="'+s.id+'">Edit</button>'
+    +'<button class="btn btn-sm btn-danger btn-del" data-id="'+s.id+'">Delete</button>'
+    +'</div></div>'
+    +'<div style="display:flex;align-items:center;gap:12px;margin-top:10px;">'
+    +'<div class="progress-bar"><div class="progress-fill '+fc+'" style="width:'+pct+'%;"></div></div>'
+    +'<p style="font-size:12px;color:#888;white-space:nowrap;">'+rl.length+'/'+s.capacity+' &middot; '+fmtPrice(s.price)+'</p>'
+    +'</div></div>';
+}
+
+function buildDetail(){
+  var s=state.sessions.find(function(x){return x.id===state.viewingId;}); if(!s) return '';
+  var rl=state.rsvps[s.id]||[],left=spotsLeft(s),past=isPast(s);
+  var html='<button class="back-btn" id="btn-back">&#8592; Back</button>'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;">'
+    +'<div><p style="font-size:18px;font-weight:500;">'+s.title+'</p>'
+    +'<p style="font-size:13px;color:#888;margin-top:2px;">'+fmtDate(s.date)+' &middot; '+s.time+' &middot; '+s.location+'</p></div>'
+    +'<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">'
+    +'<span class="badge '+(past?'badge-past':left<=0?'badge-full':'badge-open')+'">'+(past?'Past':left<=0?'Full':left+' spots left')+'</span>'
+    +'<button class="btn btn-sm btn-warn btn-edit" data-id="'+s.id+'">Edit</button>'
+    +'<button class="btn btn-sm btn-danger btn-del" data-id="'+s.id+'">Delete</button>'
+    +'</div></div>'
+    +'<div class="metric-grid" style="margin-top:16px;">'
+    +'<div class="metric"><p class="metric-label">Registered</p><p class="metric-value">'+rl.length+'/'+s.capacity+'</p></div>'
+    +'<div class="metric"><p class="metric-label">Revenue</p><p class="metric-value">$'+(rl.length*s.price).toLocaleString()+'</p></div>'
+    +'<div class="metric"><p class="metric-label">Per person</p><p class="metric-value">'+fmtPrice(s.price)+'</p></div>'
+    +'</div>'
+    +'<p style="font-size:13px;font-weight:500;color:#888;margin-bottom:12px;">Participants ('+rl.length+')</p>';
+  if(!rl.length) html+='<p style="color:#aaa;font-size:14px;padding:16px 0;">No registrations yet.</p>';
+  rl.forEach(function(r){
+    html+='<div class="p-card">'
+      +'<div style="display:flex;align-items:center;gap:12px;min-width:0;">'
+      +'<div class="avatar">'+initials(r.name)+'</div>'
+      +'<div style="min-width:0;">'
+      +'<p style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+r.name+'</p>'
+      +'<p style="font-size:12px;color:#888;">'+r.email+(r.phone?' &middot; '+r.phone:'')+'</p>'
+      +(r.notes?'<p style="font-size:12px;color:#7B2D2D;margin-top:2px;">'+r.notes+'</p>':'')
+      +'</div></div>'
+      +'<div style="text-align:right;flex-shrink:0;">'
+      +'<p style="font-size:11px;color:#aaa;">'+new Date(r.created_at||Date.now()).toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</p>'
+      +'<button class="btn btn-sm btn-danger btn-rem" data-sid="'+s.id+'" data-rid="'+r.id+'" style="margin-top:4px;">Remove</button>'
+      +'</div></div>';
+  });
+  html+='<button class="btn btn-teal btn-sm" id="btn-export" style="margin-top:16px;">Export CSV</button>';
+  return html;
+}
+
+function buildSessionForm(session){
+  var editing=!!session;
+  var v=session||{title:'',date:'',time:'',location:'',capacity:'',price:'',instruments:'',description:''};
+  return '<button class="back-btn" id="btn-back">&#8592; Back</button>'
+    +'<p style="font-size:18px;font-weight:500;margin-bottom:20px;">'+(editing?'Edit session':'Add new session')+'</p>'
+    +'<div class="form-group"><label>Session title *</label><input id="ns-title" value="'+(v.title||'')+'" placeholder="e.g. Full Moon Sound Bath"></div>'
+    +'<div class="form-row form-group"><div><label>Date *</label><input id="ns-date" type="date" value="'+(v.date||'')+'"></div><div><label>Time *</label><input id="ns-time" value="'+(v.time||'')+'" placeholder="7:00 PM"></div></div>'
+    +'<div class="form-group"><label>Location *</label><input id="ns-location" value="'+(v.location||'')+'" placeholder="Venue, city"></div>'
+    +'<div class="form-row form-group"><div><label>Capacity *</label><input id="ns-cap" type="number" value="'+(v.capacity||'')+'" placeholder="30"></div><div><label>Price ($, 0 = free)</label><input id="ns-price" type="number" value="'+(v.price||0)+'" placeholder="0"></div></div>'
+    +'<div class="form-group"><label>Instruments</label><input id="ns-instr" value="'+(v.instruments||'')+'" placeholder="Tibetan bowls, gong, koshi chimes"></div>'
+    +'<div class="form-group"><label>Description</label><textarea id="ns-desc" rows="3" placeholder="Tell participants what to expect...">'+(v.description||'')+'</textarea></div>'
+    +'<p id="save-error" style="display:none;font-size:13px;color:#c0392b;background:#fff0f0;border:1px solid #f0b0b0;border-radius:8px;padding:10px 14px;margin-bottom:12px;word-break:break-all;"></p>'
+    +'<button class="btn btn-primary" id="btn-save" data-editing-id="'+(editing?session.id:'')+'" style="width:100%;padding:11px;font-size:14px;">'+(editing?'Save changes':'Save session')+'</button>';
+}
+
+function buildConfirmDelete(){
+  var s=state.sessions.find(function(x){return x.id===state.confirmDelete;});
+  return '<div style="min-height:300px;display:flex;align-items:center;justify-content:center;">'
+    +'<div class="confirm-box">'
+    +'<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="1.5" style="margin-bottom:14px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    +'<p style="font-size:16px;font-weight:500;margin-bottom:8px;">Delete session?</p>'
+    +'<p style="font-size:13px;color:#888;margin-bottom:6px;">'+(s?s.title:'')+'</p>'
+    +'<p style="font-size:13px;color:#888;margin-bottom:24px;">This will permanently delete the session and all '+(s?(state.rsvps[s.id]||[]).length:0)+' registrations. This cannot be undone.</p>'
+    +'<div style="display:flex;gap:10px;justify-content:center;">'
+    +'<button class="btn" id="btn-cancel-delete" style="flex:1;">Cancel</button>'
+    +'<button class="btn btn-danger" id="btn-confirm-delete" data-id="'+(s?s.id:'')+'" style="flex:1;background:#c0392b;color:#fff;border-color:#c0392b;">Yes, delete</button>'
+    +'</div></div></div>';
+}
+
+function buildAddSession(){
+  return '<button class="back-btn" id="btn-back">&#8592; Back</button>'
+    +'<p class="section-title" style="margin-bottom:20px;">Add new session</p>'
+    +'<div class="form-group"><label>Session title *</label><input id="ns-title" placeholder="e.g. Full Moon Sound Bath"></div>'
+    +'<div class="form-row form-group"><div><label>Date *</label><input id="ns-date" type="date"></div><div><label>Time *</label><input id="ns-time" placeholder="7:00 PM"></div></div>'
+    +'<div class="form-group"><label>Location *</label><input id="ns-location" placeholder="Venue, city"></div>'
+    +'<div class="form-row form-group"><div><label>Capacity *</label><input id="ns-cap" type="number" placeholder="30"></div><div><label>Price ($, 0 = free)</label><input id="ns-price" type="number" placeholder="0"></div></div>'
+    +'<div class="form-group"><label>Instruments</label><input id="ns-instr" placeholder="Tibetan bowls, gong, koshi chimes"></div>'
+    +'<div class="form-group"><label>Description</label><textarea id="ns-desc" rows="3" placeholder="Tell participants what to expect..."></textarea></div>'
+    +'<p id="save-error" style="display:none;font-size:13px;color:#c0392b;background:#fff0f0;border:1px solid #f0b0b0;border-radius:8px;padding:10px 14px;margin-bottom:12px;word-break:break-all;"></p>'
+    +'<button class="btn btn-primary" id="btn-save" style="width:100%;padding:11px;font-size:14px;">Save session</button>';
+}
+
+function bind(){
+  document.querySelectorAll('.pin-key').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var k=btn.dataset.key;
+      if(k==='⌫'){state.pinEntry=state.pinEntry.slice(0,-1);state.pinError=false;render();return;}
+      if(state.pinEntry.length>=4) return;
+      state.pinEntry+=k; render();
+      if(state.pinEntry.length===4){
+        if(state.pinEntry===DASHBOARD_PIN){state.unlocked=true;state.pinEntry='';state.pinError=false;loadSessions();}
+        else{
+          state.pinError=true;
+          setTimeout(function(){var d=q('pin-dots');if(d){d.classList.add('pin-shake');setTimeout(function(){d.classList.remove('pin-shake');},400);}},10);
+          setTimeout(function(){state.pinEntry='';render();},600);
+        }
+      }
+    });
+  });
+  q('btn-logout')&&q('btn-logout').addEventListener('click',function(){state.unlocked=false;state.pinEntry='';render();});
+  q('btn-add')&&q('btn-add').addEventListener('click',function(){state.addingSession=true;state.editingSession=null;render();});
+  q('btn-back')&&q('btn-back').addEventListener('click',function(){state.addingSession=false;state.editingSession=null;state.viewingId=null;state.confirmDelete=null;render();});
+  document.querySelectorAll('[id^="dc-"]').forEach(function(el){
+    el.addEventListener('click',function(){state.viewingId=parseInt(el.id.replace('dc-',''));render();});
+  });
+  document.querySelectorAll('.btn-rem').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      deleteRSVP(parseInt(btn.dataset.sid),isNaN(btn.dataset.rid)?btn.dataset.rid:parseInt(btn.dataset.rid));
+    });
+  });
+  q('btn-export')&&q('btn-export').addEventListener('click',function(){
+    var s=state.sessions.find(function(x){return x.id===state.viewingId;}); if(!s) return;
+    var rows=[['Name','Email','Phone','Notes','Date Registered']];
+    (state.rsvps[s.id]||[]).forEach(function(r){rows.push([r.name,r.email,r.phone||'',r.notes||'',new Date(r.created_at||Date.now()).toLocaleDateString()]);});
+    var csv=rows.map(function(r){return r.map(function(c){return '"'+(c||'')+'"';}).join(',');}).join('\n');
+    var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+    a.download=s.title.replace(/\s+/g,'-')+'-participants.csv';a.click();
+    toast('CSV downloaded');
+  });
+  q('btn-save')&&q('btn-save').addEventListener('click',function(){
+    var title=q('ns-title').value.trim(),date=q('ns-date').value,time=q('ns-time').value.trim();
+    var loc=q('ns-location').value.trim(),cap=parseInt(q('ns-cap').value)||0,price=parseInt(q('ns-price').value)||0;
+    var instr=q('ns-instr').value.trim(),desc=q('ns-desc').value.trim();
+    if(!title||!date||!time||!loc||!cap){alert('Please fill in all required fields.');return;}
+    var data={title:title,date:date,time:time,location:loc,capacity:cap,price:price,instruments:instr,description:desc};
+    var editingId=q('btn-save').dataset.editingId;
+    if(editingId) updateSession(parseInt(editingId),data);
+    else saveSession(data);
+  });
+  // Edit buttons
+  document.querySelectorAll('.btn-edit').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      var id=parseInt(btn.dataset.id);
+      var s=state.sessions.find(function(x){return x.id===id;});
+      state.editingSession=s;state.addingSession=false;state.viewingId=null;render();
+    });
+  });
+
+  // Delete buttons
+  document.querySelectorAll('.btn-del').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      state.confirmDelete=parseInt(btn.dataset.id);render();
+    });
+  });
+
+  // Confirm delete
+  q('btn-confirm-delete')&&q('btn-confirm-delete').addEventListener('click',function(){
+    deleteSession(parseInt(q('btn-confirm-delete').dataset.id));
+  });
+  q('btn-cancel-delete')&&q('btn-cancel-delete').addEventListener('click',function(){
+    state.confirmDelete=null;render();
+  });
+
+}
+
+render();
+</script>
+</body>
+</html>
